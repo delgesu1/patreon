@@ -269,9 +269,6 @@ export default function AdminPage() {
         <h2 className="text-sm font-semibold uppercase text-gray-500 mb-3">
           Create Meetup
         </h2>
-        <p className="mb-3 text-xs text-slate-500">
-          Meetup and signup times are entered in Eastern Time. Hour selection is limited to whole hours.
-        </p>
         <form onSubmit={handleCreateMeetup} className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
