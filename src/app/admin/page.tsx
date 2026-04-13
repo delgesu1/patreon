@@ -156,6 +156,13 @@ export default function AdminPage() {
   async function handleDeleteMeetup(id: string) {
     if (!confirm("Delete this meetup and all its signups? This cannot be undone.")) return;
     try {
+      setMeetups((prev) => prev.filter((meetup) => meetup.id !== id));
+      setSignupsByMeetup((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      if (expandedMeetup === id) setExpandedMeetup(null);
       await adminDeleteMeetup(id);
       if (expandedMeetup === id) setExpandedMeetup(null);
       await loadMeetups();
@@ -167,49 +174,87 @@ export default function AdminPage() {
   async function handleComplete(meetupId: string) {
     if (!confirm("Mark this meetup as completed?")) return;
     try {
+      setMeetups((prev) =>
+        prev.map((meetup) =>
+          meetup.id === meetupId ? { ...meetup, status: "completed" } : meetup
+        )
+      );
       await adminCompleteMeetup(meetupId);
       await loadMeetups();
     } catch {
       alert("Failed to complete meetup");
+      await loadMeetups();
     }
   }
 
-  async function handleStatusChange(meetupId: string, signupId: string, status: string) {
+  async function handleStatusChange(
+    meetupId: string,
+    signupId: string,
+    status: Signup["status"]
+  ) {
     try {
+      setSignupsByMeetup((prev) => ({
+        ...prev,
+        [meetupId]: (prev[meetupId] || []).map((signup) =>
+          signup.id === signupId ? { ...signup, status } : signup
+        ),
+      }));
       await adminUpdateSignup(meetupId, signupId, { status });
       await loadSignups(meetupId);
     } catch {
       alert("Failed to update");
+      await loadSignups(meetupId);
     }
   }
 
   async function handleTogglePriority(meetupId: string, signup: Signup) {
     try {
+      setSignupsByMeetup((prev) => ({
+        ...prev,
+        [meetupId]: (prev[meetupId] || []).map((row) =>
+          row.id === signup.id
+            ? { ...row, granted_priority: !signup.granted_priority }
+            : row
+        ),
+      }));
       await adminUpdateSignup(meetupId, signup.id, {
         granted_priority: !signup.granted_priority,
       });
       await loadSignups(meetupId);
     } catch {
       alert("Failed to update");
+      await loadSignups(meetupId);
     }
   }
 
   async function handleRenameSignup(meetupId: string, signupId: string, newName: string) {
     try {
+      setSignupsByMeetup((prev) => ({
+        ...prev,
+        [meetupId]: (prev[meetupId] || []).map((signup) =>
+          signup.id === signupId ? { ...signup, name: newName } : signup
+        ),
+      }));
       await adminUpdateSignup(meetupId, signupId, { name: newName });
       await loadSignups(meetupId);
     } catch {
       alert("Failed to rename");
+      await loadSignups(meetupId);
     }
   }
 
   async function handleRemoveSignup(meetupId: string, signupId: string) {
     if (!confirm("Remove this signup?")) return;
     try {
+      setSignupsByMeetup((prev) => ({
+        ...prev,
+        [meetupId]: (prev[meetupId] || []).filter((signup) => signup.id !== signupId),
+      }));
       await adminDeleteSignup(meetupId, signupId);
       await loadSignups(meetupId);
     } catch {
       alert("Failed to remove");
+      await loadSignups(meetupId);
     }
   }
 
@@ -293,6 +338,7 @@ export default function AdminPage() {
           </div>
           <div className="grid gap-3">
             <EasternDateTimeField
+              key={newDate}
               label="Meetup Date & Time"
               value={newDate}
               required
@@ -304,6 +350,7 @@ export default function AdminPage() {
               }}
             />
             <EasternDateTimeField
+              key={newOpensAt}
               label="Signups Open At"
               value={newOpensAt}
               required
@@ -390,34 +437,50 @@ export default function AdminPage() {
 function AdminIdeasSection() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
 
-  useEffect(() => {
-    loadIdeas();
-    const interval = setInterval(loadIdeas, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  async function loadIdeas() {
+  const loadIdeas = useCallback(async () => {
     try {
       setIdeas(await getIdeas());
-    } catch { /* silent */ }
-  }
+    } catch {
+      // silent
+    }
+  }, []);
+
+  useEffect(() => {
+    const run = () => {
+      void loadIdeas();
+    };
+    const timeout = window.setTimeout(run, 0);
+    const interval = window.setInterval(run, 10000);
+    return () => {
+      window.clearTimeout(timeout);
+      window.clearInterval(interval);
+    };
+  }, [loadIdeas]);
 
   async function handleToggleDone(id: string, currentDone: boolean) {
     try {
+      setIdeas((prev) =>
+        prev.map((idea) =>
+          idea.id === id ? { ...idea, is_done: !currentDone } : idea
+        )
+      );
       await adminMarkIdeaDone(id, !currentDone);
       await loadIdeas();
     } catch {
       alert("Failed to update idea");
+      await loadIdeas();
     }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this idea?")) return;
     try {
+      setIdeas((prev) => prev.filter((idea) => idea.id !== id));
       await adminDeleteIdea(id);
       await loadIdeas();
     } catch {
       alert("Failed to delete idea");
+      await loadIdeas();
     }
   }
 
@@ -438,12 +501,14 @@ function AdminIdeasSection() {
             </span>
             <span className="flex-1 text-gray-700">{idea.text}</span>
             <button
+              type="button"
               onClick={() => handleToggleDone(idea.id, idea.is_done)}
               className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 hover:bg-green-200"
             >
               Done
             </button>
             <button
+              type="button"
               onClick={() => handleDelete(idea.id)}
               className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
             >
@@ -461,12 +526,14 @@ function AdminIdeasSection() {
                 <span className="text-xs text-gray-300 min-w-[1.5rem] text-center">{idea.votes}</span>
                 <span className="flex-1 text-gray-400 line-through">{idea.text}</span>
                 <button
+                  type="button"
                   onClick={() => handleToggleDone(idea.id, idea.is_done)}
                   className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-500 hover:bg-gray-200"
                 >
                   Undo
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDelete(idea.id)}
                   className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
                 >
@@ -501,7 +568,7 @@ function MeetupCard({
   onUpdateMeetup?: (data: Record<string, unknown>) => void;
   onDeleteMeetup: () => void;
   onComplete?: () => void;
-  onStatusChange: (signupId: string, status: string) => void;
+  onStatusChange: (signupId: string, status: Signup["status"]) => void;
   onTogglePriority: (signup: Signup) => void;
   onRenameSignup: (signupId: string, name: string) => void;
   onRemove: (signupId: string) => void;
@@ -576,6 +643,7 @@ function MeetupCard({
               </div>
               <div className="grid gap-3">
                 <EasternDateTimeField
+                  key={editDate}
                   label="Meetup Date & Time"
                   value={editDate}
                   compact
@@ -588,6 +656,7 @@ function MeetupCard({
                   }}
                 />
                 <EasternDateTimeField
+                  key={editOpensAt}
                   label="Signups Open At"
                   value={editOpensAt}
                   compact
@@ -603,6 +672,7 @@ function MeetupCard({
                   Save
                 </button>
                 <button
+                  type="button"
                   onClick={() => setEditing(false)}
                   className="text-xs px-3 py-1 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
                 >
@@ -619,6 +689,7 @@ function MeetupCard({
               <div className="flex gap-1">
                 {onUpdateMeetup && (
                   <button
+                    type="button"
                     onClick={() => setEditing(true)}
                     className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
                   >
@@ -626,6 +697,7 @@ function MeetupCard({
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={onDeleteMeetup}
                   className="text-xs px-2 py-0.5 rounded bg-gray-100 text-red-500 hover:bg-red-100"
                 >
@@ -686,7 +758,7 @@ function SignupRow({
 }: {
   signup: Signup;
   maxSpots: number;
-  onStatusChange: (signupId: string, status: string) => void;
+  onStatusChange: (signupId: string, status: Signup["status"]) => void;
   onTogglePriority: (signup: Signup) => void;
   onRename: (signupId: string, name: string) => void;
   onRemove: (signupId: string) => void;
@@ -771,18 +843,21 @@ function SignupRow({
         {s.status === "active" ? (
           <>
             <button
+              type="button"
               onClick={() => onStatusChange(s.id, "played")}
               className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 hover:bg-green-200"
             >
               Played
             </button>
             <button
+              type="button"
               onClick={() => onStatusChange(s.id, "not_reached")}
               className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 hover:bg-amber-200"
             >
               Skip
             </button>
             <button
+              type="button"
               onClick={() => onStatusChange(s.id, "no_show")}
               className="text-xs px-1.5 py-0.5 rounded bg-red-100 text-red-700 hover:bg-red-200"
             >
@@ -791,6 +866,7 @@ function SignupRow({
           </>
         ) : (
           <button
+            type="button"
             onClick={() => onStatusChange(s.id, "active")}
             className="text-xs px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 hover:bg-gray-300"
           >
@@ -798,6 +874,7 @@ function SignupRow({
           </button>
         )}
         <button
+          type="button"
           onClick={() => onTogglePriority(s)}
           className={`text-xs px-1.5 py-0.5 rounded ${
             s.granted_priority
@@ -813,6 +890,7 @@ function SignupRow({
           {s.granted_priority ? "★ Priority" : "☆ Priority"}
         </button>
         <button
+          type="button"
           onClick={() => onRemove(s.id)}
           className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
           title="Remove signup"

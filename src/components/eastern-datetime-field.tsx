@@ -61,7 +61,7 @@ export function EasternDateTimeField({
   value,
   onChange,
   compact = false,
-  required: _required = false,
+  required = false,
 }: EasternDateTimeFieldProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,20 +77,6 @@ export function EasternDateTimeField({
     parsed ? { year: parsed.year, month: parsed.month, day: parsed.day } : null
   );
   const [selectedHour, setSelectedHour] = useState<number | null>(parsed?.hour ?? null);
-
-  // Sync internal state when value prop changes externally
-  useEffect(() => {
-    const p = parseValue(value);
-    if (p) {
-      setSelectedDay({ year: p.year, month: p.month, day: p.day });
-      setSelectedHour(p.hour);
-      setViewYear(p.year);
-      setViewMonth(p.month);
-    } else {
-      setSelectedDay(null);
-      setSelectedHour(null);
-    }
-  }, [value]);
 
   // Click outside to close
   useEffect(() => {
@@ -159,6 +145,7 @@ export function EasternDateTimeField({
         } font-semibold uppercase tracking-[0.2em] text-slate-500`}
       >
         {label}
+        {required && <span className="ml-1 text-slate-400">*</span>}
       </label>
 
       {/* Trigger button */}

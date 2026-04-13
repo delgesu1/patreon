@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { getMeetups, getSignups, createSignup, cancelSignup, getIdeas, createIdea, upvoteIdea } from "@/lib/api";
+import {
+  getMeetups,
+  getSignups,
+  createSignup,
+  cancelSignup,
+  getIdeas,
+  createIdea,
+  upvoteIdea,
+  unvoteIdea,
+} from "@/lib/api";
 import { formatEasternDateTime } from "@/lib/eastern-time";
 import { Meetup, Signup, Idea } from "@/lib/types";
 
@@ -114,7 +123,10 @@ export default function Home() {
     if (!confirm("Cancel your signup? You'll lose your spot.")) return;
     setSubmitting(true);
     try {
+      const cancelledId = mySignup.id;
       await cancelSignup(meetup.id, mySignup.id);
+      localStorage.removeItem("signup_name");
+      setSignups((current) => current.filter((signup) => signup.id !== cancelledId));
       setMySignup(null);
       await loadData();
     } catch (err: unknown) {
@@ -192,6 +204,7 @@ export default function Home() {
                 )}
               </div>
               <button
+                type="button"
                 onClick={handleCancel}
                 disabled={submitting}
                 className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
@@ -274,6 +287,7 @@ function IdeasBoard() {
   const [newIdea, setNewIdea] = useState("");
   const [submittingIdea, setSubmittingIdea] = useState(false);
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
+  const [pendingVoteIds, setPendingVoteIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const saved = localStorage.getItem("voted_ideas");
@@ -305,15 +319,34 @@ function IdeasBoard() {
   }
 
   async function handleVote(id: string) {
-    if (votedIds.has(id)) return;
+    if (pendingVoteIds.has(id)) return;
+    const hasVoted = votedIds.has(id);
+    setPendingVoteIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+
     try {
-      await upvoteIdea(id);
       const updated = new Set(votedIds);
-      updated.add(id);
+      if (hasVoted) {
+        await unvoteIdea(id);
+        updated.delete(id);
+      } else {
+        await upvoteIdea(id);
+        updated.add(id);
+      }
       setVotedIds(updated);
       localStorage.setItem("voted_ideas", JSON.stringify([...updated]));
       await loadIdeas();
     } catch { /* silent */ }
+    finally {
+      setPendingVoteIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
   const active = ideas.filter((i) => !i.is_done);
@@ -356,14 +389,16 @@ function IdeasBoard() {
           {active.map((idea) => (
             <li key={idea.id} className="flex items-start gap-2 text-sm px-3 py-2 rounded bg-gray-50">
               <button
+                type="button"
                 onClick={() => handleVote(idea.id)}
-                disabled={votedIds.has(idea.id)}
+                disabled={pendingVoteIds.has(idea.id)}
+                aria-pressed={votedIds.has(idea.id)}
                 className={`flex flex-col items-center min-w-[2rem] pt-0.5 ${
                   votedIds.has(idea.id)
-                    ? "text-blue-500"
+                    ? "text-blue-600"
                     : "text-gray-400 hover:text-blue-500"
-                }`}
-                title={votedIds.has(idea.id) ? "Already voted" : "Upvote"}
+                } ${pendingVoteIds.has(idea.id) ? "opacity-60" : ""}`}
+                title={votedIds.has(idea.id) ? "Undo vote" : "Upvote"}
               >
                 <span className="text-xs leading-none">&#9650;</span>
                 <span className="text-xs font-medium">{idea.votes}</span>

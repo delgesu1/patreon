@@ -9,8 +9,8 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
-  // Upvote (public)
-  if (body.action === "upvote") {
+  // Upvote / unvote (public)
+  if (body.action === "upvote" || body.action === "unvote") {
     const { data: current } = await supabase
       .from("ideas")
       .select("votes")
@@ -18,9 +18,12 @@ export async function PATCH(
       .single();
     if (!current) return NextResponse.json({ error: "Idea not found" }, { status: 404 });
 
+    const nextVotes =
+      body.action === "upvote" ? current.votes + 1 : Math.max(0, current.votes - 1);
+
     const { data, error } = await supabase
       .from("ideas")
-      .update({ votes: current.votes + 1 })
+      .update({ votes: nextVotes })
       .eq("id", id)
       .select()
       .single();

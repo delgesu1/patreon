@@ -72,6 +72,15 @@ export async function upvoteIdea(id: string) {
   return handleResponse(res);
 }
 
+export async function unvoteIdea(id: string) {
+  const res = await fetch(`${BASE}/api/ideas/${id}`, {
+    method: "PATCH",
+    headers: publicHeaders(),
+    body: JSON.stringify({ action: "unvote" }),
+  });
+  return handleResponse(res);
+}
+
 export async function adminMarkIdeaDone(id: string, is_done: boolean) {
   const res = await fetch(`${BASE}/api/ideas/${id}`, {
     method: "PATCH",
