@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { EasternDateTimeField } from "@/components/eastern-datetime-field";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
   adminLogin,
   adminCreateMeetup,
@@ -154,7 +155,6 @@ export default function AdminPage() {
   }
 
   async function handleDeleteMeetup(id: string) {
-    if (!confirm("Delete this meetup and all its signups? This cannot be undone.")) return;
     try {
       setMeetups((prev) => prev.filter((meetup) => meetup.id !== id));
       setSignupsByMeetup((prev) => {
@@ -172,7 +172,6 @@ export default function AdminPage() {
   }
 
   async function handleComplete(meetupId: string) {
-    if (!confirm("Mark this meetup as completed?")) return;
     try {
       setMeetups((prev) =>
         prev.map((meetup) =>
@@ -244,7 +243,6 @@ export default function AdminPage() {
   }
 
   async function handleRemoveSignup(meetupId: string, signupId: string) {
-    if (!confirm("Remove this signup?")) return;
     try {
       setSignupsByMeetup((prev) => ({
         ...prev,
@@ -436,6 +434,7 @@ export default function AdminPage() {
 
 function AdminIdeasSection() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [deleteIdea, setDeleteIdea] = useState<Idea | null>(null);
 
   const loadIdeas = useCallback(async () => {
     try {
@@ -472,11 +471,19 @@ function AdminIdeasSection() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this idea?")) return;
+  function handleDelete(id: string) {
+    const idea = ideas.find((item) => item.id === id);
+    if (!idea) return;
+    setDeleteIdea(idea);
+  }
+
+  async function handleDeleteConfirmed() {
+    if (!deleteIdea) return;
+    const idea = deleteIdea;
+    setDeleteIdea(null);
     try {
-      setIdeas((prev) => prev.filter((idea) => idea.id !== id));
-      await adminDeleteIdea(id);
+      setIdeas((prev) => prev.filter((item) => item.id !== idea.id));
+      await adminDeleteIdea(idea.id);
       await loadIdeas();
     } catch {
       alert("Failed to delete idea");
@@ -544,6 +551,17 @@ function AdminIdeasSection() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteIdea !== null}
+        title="Delete this idea?"
+        description={deleteIdea?.text ?? ""}
+        confirmLabel="Delete idea"
+        cancelLabel="Keep idea"
+        tone="danger"
+        onClose={() => setDeleteIdea(null)}
+        onConfirm={handleDeleteConfirmed}
+      />
     </section>
   );
 }
@@ -578,6 +596,8 @@ function MeetupCard({
   const [editDate, setEditDate] = useState(toEasternDateTimeLocalValue(meetup.meetup_date));
   const [editOpensAt, setEditOpensAt] = useState(toEasternDateTimeLocalValue(meetup.signup_opens_at));
   const [editMaxSpots, setEditMaxSpots] = useState(meetup.max_spots);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [completeOpen, setCompleteOpen] = useState(false);
 
   function handleSaveEdit() {
     if (!onUpdateMeetup) return;
@@ -588,6 +608,17 @@ function MeetupCard({
       max_spots: editMaxSpots,
     });
     setEditing(false);
+  }
+
+  async function handleDeleteConfirmed() {
+    setDeleteOpen(false);
+    await onDeleteMeetup();
+  }
+
+  async function handleCompleteConfirmed() {
+    if (!onComplete) return;
+    setCompleteOpen(false);
+    await onComplete();
   }
 
   return (
@@ -698,7 +729,7 @@ function MeetupCard({
                 )}
                 <button
                   type="button"
-                  onClick={onDeleteMeetup}
+                  onClick={() => setDeleteOpen(true)}
                   className="text-xs px-2 py-0.5 rounded bg-gray-100 text-red-500 hover:bg-red-100"
                 >
                   Delete
@@ -735,13 +766,36 @@ function MeetupCard({
                 </p>
               )}
               <button
-                onClick={onComplete}
+                type="button"
+                onClick={() => setCompleteOpen(true)}
                 className="mt-2 bg-gray-900 text-white px-4 py-1.5 rounded text-sm font-medium hover:bg-gray-800"
               >
                 Complete Meetup
               </button>
             </>
           )}
+
+          <ConfirmDialog
+            open={deleteOpen}
+            title="Delete this meetup?"
+            description="This removes the meetup and all of its signups."
+            confirmLabel="Delete meetup"
+            cancelLabel="Keep meetup"
+            tone="danger"
+            onClose={() => setDeleteOpen(false)}
+            onConfirm={handleDeleteConfirmed}
+          />
+
+          <ConfirmDialog
+            open={completeOpen}
+            title="Mark this meetup as completed?"
+            description="This moves the meetup into the past section."
+            confirmLabel="Mark complete"
+            cancelLabel="Not yet"
+            tone="neutral"
+            onClose={() => setCompleteOpen(false)}
+            onConfirm={handleCompleteConfirmed}
+          />
         </div>
       )}
     </div>
@@ -765,6 +819,7 @@ function SignupRow({
 }) {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(s.name);
+  const [removeOpen, setRemoveOpen] = useState(false);
 
   function handleSaveName() {
     const trimmed = nameValue.trim();
@@ -772,6 +827,11 @@ function SignupRow({
       onRename(s.id, trimmed);
     }
     setEditingName(false);
+  }
+
+  async function handleRemoveConfirmed() {
+    setRemoveOpen(false);
+    await onRemove(s.id);
   }
 
   return (
@@ -891,13 +951,24 @@ function SignupRow({
         </button>
         <button
           type="button"
-          onClick={() => onRemove(s.id)}
+          onClick={() => setRemoveOpen(true)}
           className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
           title="Remove signup"
         >
           ×
         </button>
       </div>
+
+      <ConfirmDialog
+        open={removeOpen}
+        title="Remove this signup?"
+        description={`Remove ${s.name} from this meetup? This will cancel the signup.`}
+        confirmLabel="Remove signup"
+        cancelLabel="Keep signup"
+        tone="danger"
+        onClose={() => setRemoveOpen(false)}
+        onConfirm={handleRemoveConfirmed}
+      />
     </div>
   );
 }

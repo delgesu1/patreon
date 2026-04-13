@@ -11,6 +11,7 @@ import {
   upvoteIdea,
   unvoteIdea,
 } from "@/lib/api";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { formatEasternDateTime } from "@/lib/eastern-time";
 import { Meetup, Signup, Idea } from "@/lib/types";
 
@@ -52,6 +53,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   const loadData = useCallback(async () => {
@@ -118,9 +120,9 @@ export default function Home() {
     setSubmitting(false);
   }
 
-  async function handleCancel() {
+  async function handleCancelConfirmed() {
     if (!meetup || !mySignup) return;
-    if (!confirm("Cancel your signup? You'll lose your spot.")) return;
+    setCancelConfirmOpen(false);
     setSubmitting(true);
     try {
       const cancelledId = mySignup.id;
@@ -205,7 +207,7 @@ export default function Home() {
               </div>
               <button
                 type="button"
-                onClick={handleCancel}
+                onClick={() => setCancelConfirmOpen(true)}
                 disabled={submitting}
                 className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
               >
@@ -236,6 +238,18 @@ export default function Home() {
           {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
         </div>
       )}
+
+      <ConfirmDialog
+        open={cancelConfirmOpen}
+        title="Cancel your signup?"
+        description="You'll lose your spot and may need to sign up again later."
+        confirmLabel="Cancel signup"
+        cancelLabel="Keep signup"
+        tone="danger"
+        busy={submitting}
+        onClose={() => setCancelConfirmOpen(false)}
+        onConfirm={handleCancelConfirmed}
+      />
 
       {/* Signup list */}
       <div>
