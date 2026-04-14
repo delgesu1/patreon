@@ -108,21 +108,46 @@ export function EasternDateTimeField({
     }
   }
 
+  function commitSelection(
+    nextDay: { year: number; month: number; day: number } | null,
+    nextHour: number | null
+  ) {
+    if (!nextDay || nextHour === null) return;
+    onChange(buildValue(nextDay.year, nextDay.month, nextDay.day, nextHour));
+    setOpen(false);
+  }
+
+  function initializePickerState() {
+    const nextParsed = parseValue(value);
+    const nextNow = new Date();
+
+    if (nextParsed) {
+      setViewYear(nextParsed.year);
+      setViewMonth(nextParsed.month);
+      setSelectedDay({
+        year: nextParsed.year,
+        month: nextParsed.month,
+        day: nextParsed.day,
+      });
+      setSelectedHour(nextParsed.hour);
+      return;
+    }
+
+    setViewYear(nextNow.getFullYear());
+    setViewMonth(nextNow.getMonth() + 1);
+    setSelectedDay(null);
+    setSelectedHour(null);
+  }
+
   function handleDayClick(day: number) {
     const newDay = { year: viewYear, month: viewMonth, day };
     setSelectedDay(newDay);
-    if (selectedHour !== null) {
-      onChange(buildValue(newDay.year, newDay.month, newDay.day, selectedHour));
-      setOpen(false);
-    }
+    commitSelection(newDay, selectedHour);
   }
 
   function handleHourClick(hour: number) {
     setSelectedHour(hour);
-    if (selectedDay) {
-      onChange(buildValue(selectedDay.year, selectedDay.month, selectedDay.day, hour));
-      setOpen(false);
-    }
+    commitSelection(selectedDay, hour);
   }
 
   const display = formatDisplay(value);
@@ -151,7 +176,14 @@ export function EasternDateTimeField({
       {/* Trigger button */}
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (open) {
+            setOpen(false);
+            return;
+          }
+          initializePickerState();
+          setOpen(true);
+        }}
         className={`flex w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition duration-200 hover:border-slate-300 ${
           compact ? "px-3 py-2" : "px-3 py-2.5"
         } ${open ? "border-slate-400 ring-2 ring-slate-900/5" : ""}`}

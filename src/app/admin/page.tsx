@@ -336,7 +336,6 @@ export default function AdminPage() {
           </div>
           <div className="grid gap-3">
             <EasternDateTimeField
-              key={newDate}
               label="Meetup Date & Time"
               value={newDate}
               required
@@ -348,7 +347,6 @@ export default function AdminPage() {
               }}
             />
             <EasternDateTimeField
-              key={newOpensAt}
               label="Signups Open At"
               value={newOpensAt}
               required
@@ -674,7 +672,6 @@ function MeetupCard({
               </div>
               <div className="grid gap-3">
                 <EasternDateTimeField
-                  key={editDate}
                   label="Meetup Date & Time"
                   value={editDate}
                   compact
@@ -687,7 +684,6 @@ function MeetupCard({
                   }}
                 />
                 <EasternDateTimeField
-                  key={editOpensAt}
                   label="Signups Open At"
                   value={editOpensAt}
                   compact
