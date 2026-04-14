@@ -258,33 +258,44 @@ export default function AdminPage() {
 
   if (!authed) {
     return (
-      <div className="max-w-sm mx-auto px-4 py-16">
-        <h1 className="text-xl font-bold mb-4">Admin Login</h1>
-        <form onSubmit={handleLogin} className="space-y-3">
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full border rounded-lg px-3 py-2 pr-16 text-sm"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 px-1"
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="w-full max-w-sm">
+          <header className="text-center mb-8">
+            <h1 className="text-2xl font-bold tracking-tight text-stone-900">Daniel Kurganov</h1>
+            <p className="mt-1 text-sm text-stone-500">Admin Access</p>
+          </header>
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-lg p-6">
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-500 hover:text-stone-700 px-1 font-medium"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-stone-900 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-stone-800 transition-colors"
+              >
+                Log In
+              </button>
+              {authError && (
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-3">
+                  <p className="text-rose-700 text-sm">{authError}</p>
+                </div>
+              )}
+            </form>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-gray-900 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-800"
-          >
-            Log In
-          </button>
-          {authError && <p className="text-red-600 text-sm">{authError}</p>}
-        </form>
+        </div>
       </div>
     );
   }
@@ -293,83 +304,95 @@ export default function AdminPage() {
   const completedMeetups = meetups.filter((m) => m.status === "completed");
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-xl font-bold">Admin Dashboard</h1>
+    <div className="max-w-2xl mx-auto px-4 py-12">
+      {/* Dashboard header */}
+      <div className="flex items-start justify-between mb-10">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-stone-900">Admin Dashboard</h1>
+          <p className="mt-1 text-sm text-stone-500">Daniel Kurganov Patreon Meetups</p>
+        </div>
         <button
           onClick={() => {
             sessionStorage.removeItem("admin_password");
             setAuthed(false);
           }}
-          className="text-sm text-gray-500 hover:text-gray-700"
+          className="text-sm text-stone-500 hover:text-stone-700 hover:bg-stone-100 px-3 py-1.5 rounded-lg transition-colors font-medium"
         >
           Log out
         </button>
       </div>
 
       {/* Create Meetup */}
-      <section className="mb-8 p-4 bg-gray-50 rounded-lg">
-        <h2 className="text-sm font-semibold uppercase text-gray-500 mb-3">
+      <section className="mb-10">
+        <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
           Create Meetup
         </h2>
-        <form onSubmit={handleCreateMeetup} className="space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Title</label>
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full border rounded px-2 py-1.5 text-sm"
+        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6">
+          <form onSubmit={handleCreateMeetup} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-semibold text-stone-500 mb-1.5">Title</label>
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-stone-500 mb-1.5">Max Spots</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={newMaxSpots}
+                  onChange={(e) => setNewMaxSpots(parseInt(e.target.value) || 4)}
+                  className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+                />
+              </div>
+            </div>
+            <div className="grid gap-4">
+              <EasternDateTimeField
+                label="Meetup Date & Time"
+                value={newDate}
+                required
+                onChange={(val) => {
+                  setNewDate(val);
+                  if (val) {
+                    setNewOpensAt(shiftEasternDateTimeLocalValue(val, -7));
+                  }
+                }}
+              />
+              <EasternDateTimeField
+                label="Signups Open At"
+                value={newOpensAt}
+                required
+                onChange={setNewOpensAt}
               />
             </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Max Spots</label>
-              <input
-                type="number"
-                min={1}
-                value={newMaxSpots}
-                onChange={(e) => setNewMaxSpots(parseInt(e.target.value) || 4)}
-                className="w-full border rounded px-2 py-1.5 text-sm"
-              />
-            </div>
-          </div>
-          <div className="grid gap-3">
-            <EasternDateTimeField
-              label="Meetup Date & Time"
-              value={newDate}
-              required
-              onChange={(val) => {
-                setNewDate(val);
-                if (val) {
-                  setNewOpensAt(shiftEasternDateTimeLocalValue(val, -7));
-                }
-              }}
-            />
-            <EasternDateTimeField
-              label="Signups Open At"
-              value={newOpensAt}
-              required
-              onChange={setNewOpensAt}
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-medium hover:bg-blue-700"
-          >
-            Create Meetup
-          </button>
-          {createError && <p className="text-red-600 text-sm">{createError}</p>}
-        </form>
+            <button
+              type="submit"
+              className="bg-amber-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-amber-700 transition-colors shadow-sm"
+            >
+              Create Meetup
+            </button>
+            {createError && (
+              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3">
+                <p className="text-rose-700 text-sm">{createError}</p>
+              </div>
+            )}
+          </form>
+        </div>
       </section>
 
       {/* Upcoming Meetups */}
-      <section className="mb-8">
-        <h2 className="text-sm font-semibold uppercase text-gray-500 mb-3">
+      <section className="mb-10">
+        <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
           Upcoming Meetups ({upcomingMeetups.length})
         </h2>
         {upcomingMeetups.length === 0 && (
-          <p className="text-gray-400 text-sm">None</p>
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
+            <p className="text-stone-400 text-sm">None</p>
+          </div>
         )}
         {upcomingMeetups.map((m) => (
           <MeetupCard
@@ -396,12 +419,14 @@ export default function AdminPage() {
       </section>
 
       {/* Completed Meetups */}
-      <section>
-        <h2 className="text-sm font-semibold uppercase text-gray-500 mb-3">
+      <section className="mb-10">
+        <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
           Past Meetups ({completedMeetups.length})
         </h2>
         {completedMeetups.length === 0 && (
-          <p className="text-gray-400 text-sm">None</p>
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
+            <p className="text-stone-400 text-sm">None</p>
+          </div>
         )}
         {completedMeetups.map((m) => (
           <MeetupCard
@@ -493,59 +518,69 @@ function AdminIdeasSection() {
   const done = ideas.filter((i) => i.is_done);
 
   return (
-    <section className="mt-8 pt-6 border-t">
-      <h2 className="text-sm font-semibold uppercase text-gray-500 mb-3">
+    <section className="pt-8 border-t border-stone-200">
+      <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
         Topic Ideas ({active.length})
       </h2>
-      {active.length === 0 && <p className="text-gray-400 text-sm">None</p>}
-      <div className="space-y-1.5">
-        {active.map((idea) => (
-          <div key={idea.id} className="flex items-center gap-2 text-sm p-2 rounded bg-gray-50">
-            <span className="text-xs font-medium text-gray-500 min-w-[1.5rem] text-center">
-              {idea.votes}
-            </span>
-            <span className="flex-1 text-gray-700">{idea.text}</span>
-            <button
-              type="button"
-              onClick={() => handleToggleDone(idea.id, idea.is_done)}
-              className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 hover:bg-green-200"
-            >
-              Done
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDelete(idea.id)}
-              className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
-            >
-              &times;
-            </button>
-          </div>
-        ))}
-      </div>
-      {done.length > 0 && (
-        <div className="mt-3">
-          <p className="text-xs text-gray-400 mb-1.5">Covered ({done.length})</p>
-          <div className="space-y-1">
-            {done.map((idea) => (
-              <div key={idea.id} className="flex items-center gap-2 text-sm p-2 rounded">
-                <span className="text-xs text-gray-300 min-w-[1.5rem] text-center">{idea.votes}</span>
-                <span className="flex-1 text-gray-400 line-through">{idea.text}</span>
+      {active.length === 0 && (
+        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
+          <p className="text-stone-400 text-sm">None</p>
+        </div>
+      )}
+      {active.length > 0 && (
+        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="divide-y divide-stone-100">
+            {active.map((idea) => (
+              <div key={idea.id} className="flex items-center gap-3 text-sm px-4 py-3">
+                <span className="text-xs font-semibold text-stone-500 min-w-[1.5rem] text-center tabular-nums">
+                  {idea.votes}
+                </span>
+                <span className="flex-1 text-stone-700">{idea.text}</span>
                 <button
                   type="button"
                   onClick={() => handleToggleDone(idea.id, idea.is_done)}
-                  className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  className="text-xs px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium transition-colors"
                 >
-                  Undo
+                  Done
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(idea.id)}
-                  className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
+                  className="text-xs px-2 py-1 rounded-lg bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600 transition-colors"
                 >
                   &times;
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+      {done.length > 0 && (
+        <div className="mt-5">
+          <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 mb-2">Covered ({done.length})</p>
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="divide-y divide-stone-100">
+              {done.map((idea) => (
+                <div key={idea.id} className="flex items-center gap-3 text-sm px-4 py-3">
+                  <span className="text-xs text-stone-300 min-w-[1.5rem] text-center tabular-nums">{idea.votes}</span>
+                  <span className="flex-1 text-stone-400 line-through">{idea.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleDone(idea.id, idea.is_done)}
+                    className="text-xs px-2.5 py-1 rounded-lg bg-stone-100 text-stone-500 hover:bg-stone-200 font-medium transition-colors"
+                  >
+                    Undo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(idea.id)}
+                    className="text-xs px-2 py-1 rounded-lg bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600 transition-colors"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -620,53 +655,53 @@ function MeetupCard({
   }
 
   return (
-    <div className="border rounded-lg mb-3">
+    <div className="bg-white border border-stone-200 rounded-2xl shadow-sm mb-3 overflow-hidden transition-shadow hover:shadow-md">
       <button
         onClick={onToggleExpand}
-        className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50"
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-stone-50/50 transition-colors"
       >
         <div>
-          <span className="font-medium text-sm">{meetup.title}</span>
-          <span className="text-xs text-gray-500 ml-2">
+          <span className="font-semibold text-sm text-stone-900">{meetup.title}</span>
+          <span className="text-xs text-stone-500 ml-2">
             {formatEasternDateTimeShort(meetup.meetup_date)}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-stone-500">
             {signups.length} signup{signups.length !== 1 ? "s" : ""}
           </span>
           {meetup.status === "completed" && (
-            <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
+            <span className="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-lg font-medium">
               completed
             </span>
           )}
-          <span className="text-gray-400 text-xs">{expanded ? "▲" : "▼"}</span>
+          <span className="text-stone-400 text-xs">{expanded ? "▲" : "▼"}</span>
         </div>
       </button>
 
       {expanded && (
-        <div className="border-t p-3">
+        <div className="border-t border-stone-100 p-4">
           {/* Meetup details / edit form */}
           {editing ? (
-            <div className="mb-4 p-3 bg-gray-50 rounded space-y-2">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mb-4 p-4 bg-stone-50 rounded-xl space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-0.5">Title</label>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1">Title</label>
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full border rounded px-2 py-1 text-sm"
+                    className="w-full border border-stone-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-0.5">Max Spots</label>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1">Max Spots</label>
                   <input
                     type="number"
                     min={1}
                     value={editMaxSpots}
                     onChange={(e) => setEditMaxSpots(parseInt(e.target.value) || 4)}
-                    className="w-full border rounded px-2 py-1 text-sm"
+                    className="w-full border border-stone-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
                   />
                 </div>
               </div>
@@ -694,31 +729,31 @@ function MeetupCard({
               <div className="flex gap-2">
                 <button
                   onClick={handleSaveEdit}
-                  className="text-xs px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                  className="text-xs px-4 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 font-semibold transition-colors"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditing(false)}
-                  className="text-xs px-3 py-1 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  className="text-xs px-4 py-1.5 rounded-lg bg-stone-200 text-stone-700 hover:bg-stone-300 font-medium transition-colors"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-xs text-gray-500">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-xs text-stone-500">
                 Signups open: {formatEasternDateTimeShort(meetup.signup_opens_at)} | Max spots:{" "}
                 {meetup.max_spots}
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {onUpdateMeetup && (
                   <button
                     type="button"
                     onClick={() => setEditing(true)}
-                    className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    className="text-xs px-2.5 py-1 rounded-lg bg-stone-100 text-stone-600 hover:bg-stone-200 font-medium transition-colors"
                   >
                     Edit
                   </button>
@@ -726,7 +761,7 @@ function MeetupCard({
                 <button
                   type="button"
                   onClick={() => setDeleteOpen(true)}
-                  className="text-xs px-2 py-0.5 rounded bg-gray-100 text-red-500 hover:bg-red-100"
+                  className="text-xs px-2.5 py-1 rounded-lg bg-stone-100 text-rose-500 hover:bg-rose-100 font-medium transition-colors"
                 >
                   Delete
                 </button>
@@ -736,9 +771,9 @@ function MeetupCard({
 
           {/* Signups list */}
           {signups.length === 0 ? (
-            <p className="text-gray-400 text-sm">No signups</p>
+            <p className="text-stone-400 text-sm text-center py-3">No signups</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {signups.map((s) => (
                 <SignupRow
                   key={s.id}
@@ -756,7 +791,7 @@ function MeetupCard({
           {onComplete && meetup.status === "upcoming" && (
             <>
               {signups.length > 0 && signups.some((s) => s.status === "active") && (
-                <p className="mt-3 text-xs text-amber-600">
+                <p className="mt-3 text-xs text-amber-600 font-medium">
                   {signups.filter((s) => s.status === "active").length} of{" "}
                   {signups.length} signups still unmarked
                 </p>
@@ -764,7 +799,7 @@ function MeetupCard({
               <button
                 type="button"
                 onClick={() => setCompleteOpen(true)}
-                className="mt-2 bg-gray-900 text-white px-4 py-1.5 rounded text-sm font-medium hover:bg-gray-800"
+                className="mt-3 bg-stone-900 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-stone-800 transition-colors"
               >
                 Complete Meetup
               </button>
@@ -832,12 +867,18 @@ function SignupRow({
 
   return (
     <div
-      className={`flex items-center gap-2 text-sm p-2 rounded ${
-        s.position <= maxSpots ? "bg-green-50" : "bg-gray-50"
+      className={`flex items-center gap-2 text-sm p-3 rounded-xl ${
+        s.position <= maxSpots ? "bg-emerald-50" : "bg-stone-50"
       }`}
     >
-      <span className="font-mono text-xs w-5 text-right text-gray-400">
-        {s.position}.
+      <span
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
+          s.position <= maxSpots
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-stone-200 text-stone-500"
+        }`}
+      >
+        {s.position}
       </span>
 
       {editingName ? (
@@ -850,25 +891,25 @@ function SignupRow({
               if (e.key === "Enter") handleSaveName();
               if (e.key === "Escape") setEditingName(false);
             }}
-            className="border rounded px-1.5 py-0.5 text-sm w-32"
+            className="border border-stone-200 rounded-lg px-2 py-0.5 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
             autoFocus
           />
           <button
             onClick={handleSaveName}
-            className="text-xs text-blue-600 hover:text-blue-800"
+            className="text-xs text-amber-600 hover:text-amber-700 font-medium"
           >
             Save
           </button>
           <button
             onClick={() => { setNameValue(s.name); setEditingName(false); }}
-            className="text-xs text-gray-400 hover:text-gray-600"
+            className="text-xs text-stone-400 hover:text-stone-600"
           >
             Cancel
           </button>
         </span>
       ) : (
         <span
-          className="font-medium min-w-0 cursor-pointer hover:underline"
+          className="font-medium min-w-0 cursor-pointer hover:underline text-stone-900"
           onClick={() => setEditingName(true)}
           title="Click to edit name"
         >
@@ -877,18 +918,18 @@ function SignupRow({
       )}
 
       {s.has_priority && (
-        <span className="text-xs bg-purple-100 text-purple-700 px-1 rounded shrink-0">
+        <span className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-md shrink-0 font-medium">
           P
         </span>
       )}
       {s.status !== "active" && (
         <span
-          className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${
+          className={`text-xs px-1.5 py-0.5 rounded-md shrink-0 font-medium ${
             s.status === "played"
-              ? "bg-green-200 text-green-800"
+              ? "bg-emerald-100 text-emerald-700"
               : s.status === "not_reached"
-              ? "bg-amber-200 text-amber-800"
-              : "bg-red-200 text-red-800"
+              ? "bg-amber-100 text-amber-700"
+              : "bg-rose-100 text-rose-700"
           }`}
         >
           {s.status.replace("_", " ")}
@@ -901,21 +942,21 @@ function SignupRow({
             <button
               type="button"
               onClick={() => onStatusChange(s.id, "played")}
-              className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 hover:bg-green-200"
+              className="text-xs px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium transition-colors"
             >
               Played
             </button>
             <button
               type="button"
               onClick={() => onStatusChange(s.id, "not_reached")}
-              className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 hover:bg-amber-200"
+              className="text-xs px-2 py-1 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 font-medium transition-colors"
             >
               Skip
             </button>
             <button
               type="button"
               onClick={() => onStatusChange(s.id, "no_show")}
-              className="text-xs px-1.5 py-0.5 rounded bg-red-100 text-red-700 hover:bg-red-200"
+              className="text-xs px-2 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium transition-colors"
             >
               No-show
             </button>
@@ -924,7 +965,7 @@ function SignupRow({
           <button
             type="button"
             onClick={() => onStatusChange(s.id, "active")}
-            className="text-xs px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 hover:bg-gray-300"
+            className="text-xs px-2 py-1 rounded-lg bg-stone-200 text-stone-600 hover:bg-stone-300 font-medium transition-colors"
           >
             Undo
           </button>
@@ -932,10 +973,10 @@ function SignupRow({
         <button
           type="button"
           onClick={() => onTogglePriority(s)}
-          className={`text-xs px-1.5 py-0.5 rounded ${
+          className={`text-xs px-2 py-1 rounded-lg font-medium transition-colors ${
             s.granted_priority
-              ? "bg-purple-200 text-purple-800"
-              : "bg-gray-100 text-gray-500 hover:bg-purple-100"
+              ? "bg-violet-200 text-violet-800"
+              : "bg-stone-100 text-stone-500 hover:bg-violet-100 hover:text-violet-700"
           }`}
           title={
             s.granted_priority
@@ -948,7 +989,7 @@ function SignupRow({
         <button
           type="button"
           onClick={() => setRemoveOpen(true)}
-          className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
+          className="text-xs px-2 py-1 rounded-lg bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600 transition-colors"
           title="Remove signup"
         >
           ×

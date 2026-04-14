@@ -167,10 +167,10 @@ export function EasternDateTimeField({
       <label
         className={`block ${
           compact ? "text-[11px]" : "text-xs"
-        } font-semibold uppercase tracking-[0.2em] text-slate-500`}
+        } font-semibold uppercase tracking-[0.2em] text-stone-500`}
       >
         {label}
-        {required && <span className="ml-1 text-slate-400">*</span>}
+        {required && <span className="ml-1 text-stone-400">*</span>}
       </label>
 
       {/* Trigger button */}
@@ -184,14 +184,14 @@ export function EasternDateTimeField({
           initializePickerState();
           setOpen(true);
         }}
-        className={`flex w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition duration-200 hover:border-slate-300 ${
+        className={`flex w-full items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition duration-200 hover:border-stone-300 ${
           compact ? "px-3 py-2" : "px-3 py-2.5"
-        } ${open ? "border-slate-400 ring-2 ring-slate-900/5" : ""}`}
+        } ${open ? "border-amber-500 ring-2 ring-amber-500/20" : ""}`}
       >
-        <span className={`text-sm ${display ? "text-slate-900" : "text-slate-400"}`}>
+        <span className={`text-sm ${display ? "text-stone-900" : "text-stone-400"}`}>
           {display ?? "Select date & time"}
         </span>
-        <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <span className="shrink-0 rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">
           ET
         </span>
       </button>
@@ -199,22 +199,22 @@ export function EasternDateTimeField({
       {/* Popup */}
       {open && (
         <div className="relative z-50">
-          <div className="absolute left-0 top-1 w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-lg">
+          <div className="absolute left-0 top-1 w-full rounded-2xl border border-stone-200 bg-white p-4 shadow-xl ring-1 ring-stone-900/5">
             {/* Calendar */}
             <div className="mb-4">
               <div className="mb-2 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={prevMonth}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 transition-colors"
                 >
                   &lsaquo;
                 </button>
-                <span className="text-sm font-semibold text-slate-800">{monthLabel}</span>
+                <span className="text-sm font-semibold text-stone-800">{monthLabel}</span>
                 <button
                   type="button"
                   onClick={nextMonth}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 transition-colors"
                 >
                   &rsaquo;
                 </button>
@@ -222,7 +222,7 @@ export function EasternDateTimeField({
 
               <div className="grid grid-cols-7 gap-0.5 text-center">
                 {DAYS.map((d) => (
-                  <div key={d} className="py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  <div key={d} className="py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
                     {d}
                   </div>
                 ))}
@@ -245,10 +245,10 @@ export function EasternDateTimeField({
                       onClick={() => handleDayClick(day)}
                       className={`rounded-lg py-1.5 text-sm transition ${
                         isSelected
-                          ? "bg-slate-900 font-semibold text-white"
+                          ? "bg-amber-600 font-semibold text-white"
                           : isToday
-                          ? "bg-slate-100 font-semibold text-slate-900"
-                          : "text-slate-700 hover:bg-slate-100"
+                          ? "bg-stone-100 font-semibold text-stone-900"
+                          : "text-stone-700 hover:bg-stone-100"
                       }`}
                     >
                       {day}
@@ -259,11 +259,11 @@ export function EasternDateTimeField({
             </div>
 
             {/* Divider */}
-            <div className="mb-3 border-t border-slate-100" />
+            <div className="mb-3 border-t border-stone-100" />
 
             {/* Hour grid */}
             <div>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
                 Hour
               </p>
               <div className="grid grid-cols-4 gap-1">
@@ -274,8 +274,8 @@ export function EasternDateTimeField({
                     onClick={() => handleHourClick(h)}
                     className={`rounded-lg px-1 py-1.5 text-xs transition ${
                       selectedHour === h
-                        ? "bg-slate-900 font-semibold text-white"
-                        : "text-slate-700 hover:bg-slate-100"
+                        ? "bg-amber-600 font-semibold text-white"
+                        : "text-stone-700 hover:bg-stone-100"
                     }`}
                   >
                     {formatHour(h)}

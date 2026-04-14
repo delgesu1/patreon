@@ -42,7 +42,7 @@ function Countdown({ target }: { target: string }) {
   }, [target]);
 
   if (!timeLeft) return null;
-  return <span className="text-amber-600 font-medium">{timeLeft}</span>;
+  return <span className="text-amber-600 font-semibold tabular-nums">{timeLeft}</span>;
 }
 
 export default function Home() {
@@ -142,17 +142,23 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-amber-600" />
+          <p className="mt-3 text-sm text-stone-500">Loading...</p>
+        </div>
       </div>
     );
   }
 
   if (!meetup) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <div className="text-center py-8">
-          <h1 className="text-2xl font-bold mb-4">Violin Meetup</h1>
-          <p className="text-gray-500">No upcoming meetups scheduled. Check back later!</p>
+      <div className="max-w-lg mx-auto px-4 py-12">
+        <header className="text-center mb-10">
+          <h1 className="text-3xl font-bold tracking-tight text-stone-900">Daniel Kurganov</h1>
+          <p className="mt-1 text-sm text-stone-500 tracking-wide">Patreon Violin Meetups</p>
+        </header>
+        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-8 text-center">
+          <p className="text-stone-500">No upcoming meetups scheduled. Check back later!</p>
         </div>
         <IdeasBoard />
       </div>
@@ -164,80 +170,123 @@ export default function Home() {
   const spotsRemaining = Math.max(0, meetup.max_spots - spotsConfirmed);
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-1">{meetup.title}</h1>
-      <p className="text-gray-600 mb-1">{formatEasternDateTime(meetup.meetup_date)}</p>
-      <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-6">
-        Eastern Time
-      </p>
+    <div className="max-w-lg mx-auto px-4 py-12">
+      {/* Branded header */}
+      <header className="text-center mb-10">
+        <h1 className="text-3xl font-bold tracking-tight text-stone-900">Daniel Kurganov</h1>
+        <p className="mt-1 text-sm text-stone-500 tracking-wide">Patreon Violin Meetups</p>
+      </header>
+
+      {/* Meetup info card */}
+      <div className="bg-gradient-to-br from-amber-50 to-stone-50 border border-stone-200 rounded-2xl shadow-sm p-6 mb-8">
+        <h2 className="text-xl font-bold tracking-tight text-stone-900 mb-1">{meetup.title}</h2>
+        <p className="text-stone-700 font-medium">{formatEasternDateTime(meetup.meetup_date)}</p>
+        <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 mt-1">
+          Eastern Time
+        </p>
+      </div>
 
       {!signupsOpen && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-amber-800">
-            Signups open in <Countdown target={meetup.signup_opens_at} />
-          </p>
-          <p className="text-xs text-amber-600 mt-1">
-            Opens {formatEasternDateTime(meetup.signup_opens_at)}
-          </p>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-8 flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-amber-800">
+              Signups open in <Countdown target={meetup.signup_opens_at} />
+            </p>
+            <p className="text-xs text-amber-600 mt-1">
+              Opens {formatEasternDateTime(meetup.signup_opens_at)}
+            </p>
+          </div>
         </div>
       )}
 
       {signupsOpen && (
-        <div className="mb-6">
-          <p className="text-sm text-gray-600 mb-4">
-            <span className="font-semibold text-gray-900">{spotsRemaining}</span> of{" "}
-            {meetup.max_spots} spots remaining
-          </p>
+        <div className="mb-8">
+          {/* Spots remaining */}
+          <div className="flex items-baseline gap-2 mb-5">
+            <span className="text-2xl font-bold text-amber-600 tabular-nums">{spotsRemaining}</span>
+            <span className="text-sm text-stone-500">
+              of {meetup.max_spots} spots remaining
+            </span>
+          </div>
 
           {mySignup ? (
-            <div className="bg-white border rounded-lg p-4">
-              <div className="mb-3">
+            <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5">
+              <div className="flex items-start gap-3 mb-3">
                 {mySignup.position <= meetup.max_spots ? (
-                  <p className="text-green-700 font-semibold">
-                    You&apos;re confirmed! (Spot #{mySignup.position})
-                  </p>
+                  <>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-emerald-700 font-semibold">
+                        You&apos;re confirmed! (Spot #{mySignup.position})
+                      </p>
+                    </div>
+                  </>
                 ) : (
-                  <p className="text-amber-700 font-semibold">
-                    You&apos;re on the waitlist (Position #{mySignup.position})
-                  </p>
-                )}
-                {mySignup.has_priority && (
-                  <span className="inline-block mt-1 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
-                    Moved to front — didn&apos;t get to play last time
-                  </span>
+                  <>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-amber-700 font-semibold">
+                        You&apos;re on the waitlist (Position #{mySignup.position})
+                      </p>
+                    </div>
+                  </>
                 )}
               </div>
+              {mySignup.has_priority && (
+                <span className="inline-block mb-3 text-xs bg-violet-100 text-violet-700 px-2.5 py-1 rounded-lg font-medium">
+                  Moved to front — didn&apos;t get to play last time
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => setCancelConfirmOpen(true)}
                 disabled={submitting}
-                className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+                className="text-sm text-rose-600 hover:text-rose-700 font-medium disabled:opacity-50 transition-colors"
               >
                 {submitting ? "Cancelling..." : "Cancel my signup"}
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSignup} className="flex gap-2">
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-                aria-label="Your name"
-                maxLength={100}
-                className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                disabled={submitting || !name.trim()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-              >
-                {submitting ? "Signing up..." : spotsRemaining > 0 ? "Sign Up to Play" : "Join Waitlist"}
-              </button>
-            </form>
+            <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5">
+              <form onSubmit={handleSignup} className="flex gap-3">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  aria-label="Your name"
+                  maxLength={100}
+                  className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting || !name.trim()}
+                  className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
+                >
+                  {submitting ? "Signing up..." : spotsRemaining > 0 ? "Sign Up to Play" : "Join Waitlist"}
+                </button>
+              </form>
+            </div>
           )}
 
-          {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+          {error && (
+            <div className="mt-3 bg-rose-50 border border-rose-200 rounded-xl p-3">
+              <p className="text-rose-700 text-sm">{error}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -253,43 +302,49 @@ export default function Home() {
         onConfirm={handleCancelConfirmed}
       />
 
-      {/* Signup list */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+      {/* Signup queue */}
+      <div className="mb-12">
+        <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
           Signup Queue ({signups.length})
         </h2>
         {signups.length === 0 ? (
-          <p className="text-gray-400 text-sm">No signups yet. Be the first!</p>
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
+            <p className="text-stone-400 text-sm">No signups yet. Be the first!</p>
+          </div>
         ) : (
-          <ol className="space-y-1">
-            {signups.map((s) => (
-              <li
-                key={s.id}
-                className={`flex items-center gap-2 text-sm px-3 py-2 rounded ${
-                  s.position <= meetup.max_spots
-                    ? "bg-green-50 text-green-800"
-                    : "bg-gray-50 text-gray-600"
-                } ${
-                  mySignup?.id === s.id ? "ring-2 ring-blue-300" : ""
-                }`}
-              >
-                <span className="font-mono text-xs w-6 text-right text-gray-400">
-                  {s.position}.
-                </span>
-                <span className="font-medium">{s.name}</span>
-                {s.has_priority && (
-                  <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded" title="Didn't get to play last time">
-                    priority
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+            <ol className="divide-y divide-stone-100">
+              {signups.map((s) => (
+                <li
+                  key={s.id}
+                  className={`flex items-center gap-3 text-sm px-4 py-3 ${
+                    mySignup?.id === s.id ? "ring-2 ring-inset ring-amber-400/50 bg-amber-50/30" : ""
+                  }`}
+                >
+                  <span
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                      s.position <= meetup.max_spots
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-stone-100 text-stone-500"
+                    }`}
+                  >
+                    {s.position}
                   </span>
-                )}
-                {s.position <= meetup.max_spots ? (
-                  <span className="ml-auto text-xs text-green-600">confirmed</span>
-                ) : (
-                  <span className="ml-auto text-xs text-gray-400">waitlist</span>
-                )}
-              </li>
-            ))}
-          </ol>
+                  <span className="font-medium text-stone-900">{s.name}</span>
+                  {s.has_priority && (
+                    <span className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-md font-medium" title="Didn't get to play last time">
+                      priority
+                    </span>
+                  )}
+                  {s.position <= meetup.max_spots ? (
+                    <span className="ml-auto text-xs font-medium text-emerald-600">confirmed</span>
+                  ) : (
+                    <span className="ml-auto text-xs text-stone-400">waitlist</span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
         )}
       </div>
 
@@ -369,73 +424,81 @@ function IdeasBoard() {
   const done = ideas.filter((i) => i.is_done);
 
   return (
-    <div className="mt-10 border-t pt-8">
-      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">
+    <div className="pt-8 border-t border-stone-200">
+      <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-1">
         Topic Ideas
       </h2>
-      <p className="text-xs text-gray-400 mb-4">
+      <p className="text-xs text-stone-400 mb-5 leading-relaxed">
         Suggest topics for upcoming meetups. Vote on what interests you!
       </p>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
-        <input
-          type="text"
-          value={newIdea}
-          onChange={(e) => setNewIdea(e.target.value)}
-          placeholder="Suggest a topic or question..."
-          aria-label="Suggest a topic or question"
-          maxLength={500}
-          className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          disabled={submittingIdea || !newIdea.trim()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submittingIdea ? "..." : "Submit"}
-        </button>
-      </form>
+      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5 mb-5">
+        <form onSubmit={handleSubmit} className="flex gap-3">
+          <input
+            type="text"
+            value={newIdea}
+            onChange={(e) => setNewIdea(e.target.value)}
+            placeholder="Suggest a topic or question..."
+            aria-label="Suggest a topic or question"
+            maxLength={500}
+            className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+          />
+          <button
+            type="submit"
+            disabled={submittingIdea || !newIdea.trim()}
+            className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
+          >
+            {submittingIdea ? "..." : "Submit"}
+          </button>
+        </form>
+      </div>
 
       {active.length === 0 && done.length === 0 && (
-        <p className="text-gray-400 text-sm">No ideas yet. Be the first to suggest one!</p>
+        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
+          <p className="text-stone-400 text-sm">No ideas yet. Be the first to suggest one!</p>
+        </div>
       )}
 
       {active.length > 0 && (
-        <ul className="space-y-1.5">
-          {active.map((idea) => (
-            <li key={idea.id} className="flex items-start gap-2 text-sm px-3 py-2 rounded bg-gray-50">
-              <button
-                type="button"
-                onClick={() => handleVote(idea.id)}
-                disabled={pendingVoteIds.has(idea.id)}
-                aria-pressed={votedIds.has(idea.id)}
-                className={`flex flex-col items-center min-w-[2rem] pt-0.5 ${
-                  votedIds.has(idea.id)
-                    ? "text-blue-600"
-                    : "text-gray-400 hover:text-blue-500"
-                } ${pendingVoteIds.has(idea.id) ? "opacity-60" : ""}`}
-                title={votedIds.has(idea.id) ? "Undo vote" : "Upvote"}
-              >
-                <span className="text-xs leading-none">&#9650;</span>
-                <span className="text-xs font-medium">{idea.votes}</span>
-              </button>
-              <span className="text-gray-700">{idea.text}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {done.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs text-gray-400 mb-1.5">Covered</p>
-          <ul className="space-y-1">
-            {done.map((idea) => (
-              <li key={idea.id} className="flex items-start gap-2 text-sm px-3 py-1.5 rounded">
-                <span className="min-w-[2rem] text-center text-xs text-gray-300 pt-0.5">{idea.votes}</span>
-                <span className="text-gray-400 line-through">{idea.text}</span>
+        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+          <ul className="divide-y divide-stone-100">
+            {active.map((idea) => (
+              <li key={idea.id} className="flex items-start gap-3 text-sm px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleVote(idea.id)}
+                  disabled={pendingVoteIds.has(idea.id)}
+                  aria-pressed={votedIds.has(idea.id)}
+                  className={`flex flex-col items-center min-w-[2rem] pt-0.5 transition-colors ${
+                    votedIds.has(idea.id)
+                      ? "text-amber-600"
+                      : "text-stone-400 hover:text-amber-500"
+                  } ${pendingVoteIds.has(idea.id) ? "opacity-60" : ""}`}
+                  title={votedIds.has(idea.id) ? "Undo vote" : "Upvote"}
+                >
+                  <span className="text-xs leading-none">&#9650;</span>
+                  <span className="text-xs font-semibold tabular-nums">{idea.votes}</span>
+                </button>
+                <span className="text-stone-700 leading-relaxed">{idea.text}</span>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {done.length > 0 && (
+        <div className="mt-5">
+          <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 mb-2">Covered</p>
+          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+            <ul className="divide-y divide-stone-100">
+              {done.map((idea) => (
+                <li key={idea.id} className="flex items-start gap-3 text-sm px-4 py-3">
+                  <span className="min-w-[2rem] text-center text-xs text-stone-300 pt-0.5 tabular-nums">{idea.votes}</span>
+                  <span className="text-stone-400 line-through">{idea.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>

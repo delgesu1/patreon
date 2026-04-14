@@ -8,8 +8,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Violin Meetup Signup",
-  description: "Sign up for bi-weekly violin meetups",
+  title: "Daniel Kurganov — Patreon Meetups",
+  description: "Sign up for bi-weekly violin meetups with Daniel Kurganov",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900">{children}</body>
     </html>
   );
 }
