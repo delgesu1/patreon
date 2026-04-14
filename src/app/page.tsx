@@ -159,7 +159,7 @@ export default function Home() {
           <h1 className="text-3xl font-bold tracking-tight text-stone-900">Daniel Kurganov</h1>
           <p className="mt-1 text-sm text-stone-500 tracking-wide">Patreon Violin Meetups</p>
         </header>
-        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-8 text-center">
+        <div className="bg-white border border-stone-200 rounded-2xl p-8 text-center">
           <p className="text-stone-500">No upcoming meetups scheduled. Check back later!</p>
         </div>
         <IdeasBoard />
@@ -179,158 +179,145 @@ export default function Home() {
         <p className="mt-1 text-sm text-stone-500 tracking-wide">Patreon Violin Meetups</p>
       </header>
 
-      {/* Meetup info card */}
-      <div className="bg-gradient-to-br from-amber-50 to-stone-50 border border-stone-200 rounded-2xl shadow-sm p-6 mb-8">
-        <h2 className="text-xl font-bold tracking-tight text-stone-900 mb-1">{meetup.title}</h2>
-        <p className="text-stone-700 font-medium">{formatEasternDateTime(meetup.meetup_date)}</p>
-        <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 mt-1">
-          Eastern Time
-        </p>
-      </div>
-
-      {!signupsOpen && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-8 flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-amber-800">
-              Signups open in <Countdown target={meetup.signup_opens_at} />
-            </p>
-            <p className="text-xs text-amber-600 mt-1">
-              Opens {formatEasternDateTime(meetup.signup_opens_at)}
-            </p>
-          </div>
+      {/* Unified meetup panel */}
+      <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden mb-8">
+        {/* Warm gradient header band */}
+        <div className="bg-gradient-to-br from-amber-50 to-stone-50 px-6 pt-6 pb-5">
+          <h2 className="text-xl font-bold tracking-tight text-stone-900 mb-1">{meetup.title}</h2>
+          <p className="text-stone-700 font-medium">{formatEasternDateTime(meetup.meetup_date)}</p>
+          <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 mt-1">
+            Eastern Time
+          </p>
         </div>
-      )}
 
-      {signupsOpen && (
-        <div className="mb-8">
-          {/* Spots remaining */}
-          <div className="flex items-baseline gap-2 mb-5">
-            <span className="text-2xl font-bold text-amber-600 tabular-nums">{spotsRemaining}</span>
-            <span className="text-sm text-stone-500">
-              of {meetup.max_spots} spots remaining
-            </span>
-          </div>
-
-          {mySignup ? (
-            <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5">
-              <div className="flex items-start gap-3 mb-3">
-                {mySignup.position <= meetup.max_spots ? (
-                  <>
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-emerald-700 font-semibold">
-                        You&apos;re confirmed! (Spot #{mySignup.position})
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-amber-700 font-semibold">
-                        You&apos;re on the waitlist (Position #{mySignup.position})
-                      </p>
-                    </div>
-                  </>
-                )}
-              </div>
-              {mySignup.has_priority && (
-                <span className="inline-block mb-3 text-xs bg-violet-100 text-violet-700 px-2.5 py-1 rounded-lg font-medium">
-                  Moved to front — didn&apos;t get to play last time
-                </span>
-              )}
-              {mySignup.note && (
-                <p className="text-sm text-stone-500 italic mb-3">
-                  &ldquo;{mySignup.note}&rdquo;
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={() => setCancelConfirmOpen(true)}
-                disabled={submitting}
-                className="text-sm text-rose-600 hover:text-rose-700 font-medium disabled:opacity-50 transition-colors"
-              >
-                {submitting ? "Cancelling..." : "Cancel my signup"}
-              </button>
+        {!signupsOpen && (
+          <div className="border-t border-stone-100 px-6 py-4 flex items-start gap-3 bg-amber-50/50">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
             </div>
-          ) : (
-            <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5">
-              <form onSubmit={handleSignup} className="space-y-3">
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name"
-                    aria-label="Your name"
-                    maxLength={100}
-                    className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
-                  />
+            <div>
+              <p className="text-sm font-medium text-amber-800">
+                Signups open in <Countdown target={meetup.signup_opens_at} />
+              </p>
+              <p className="text-xs text-amber-600 mt-1">
+                Opens {formatEasternDateTime(meetup.signup_opens_at)}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {signupsOpen && (
+          <>
+            {/* Spots remaining + form/status */}
+            <div className="border-t border-stone-100 px-6 py-5">
+              <div className="flex items-baseline gap-2 mb-5">
+                <span className="text-2xl font-bold text-amber-600 tabular-nums">{spotsRemaining}</span>
+                <span className="text-sm text-stone-500">
+                  of {meetup.max_spots} spots remaining
+                </span>
+              </div>
+
+              {mySignup ? (
+                <div>
+                  <div className="flex items-start gap-3 mb-3">
+                    {mySignup.position <= meetup.max_spots ? (
+                      <>
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-emerald-700 font-semibold">
+                            You&apos;re confirmed! (Spot #{mySignup.position})
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-amber-700 font-semibold">
+                            You&apos;re on the waitlist (Position #{mySignup.position})
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {mySignup.has_priority && (
+                    <span className="inline-block mb-3 text-xs bg-violet-100 text-violet-700 px-2.5 py-1 rounded-lg font-medium">
+                      Moved to front — didn&apos;t get to play last time
+                    </span>
+                  )}
+                  {mySignup.note && (
+                    <p className="text-sm text-stone-500 italic mb-3">
+                      &ldquo;{mySignup.note}&rdquo;
+                    </p>
+                  )}
                   <button
-                    type="submit"
-                    disabled={submitting || !name.trim()}
-                    className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
+                    type="button"
+                    onClick={() => setCancelConfirmOpen(true)}
+                    disabled={submitting}
+                    className="text-sm text-rose-600 hover:text-rose-700 font-medium disabled:opacity-50 transition-colors"
                   >
-                    {submitting ? "Signing up..." : spotsRemaining > 0 ? "Sign Up to Play" : "Join Waitlist"}
+                    {submitting ? "Cancelling..." : "Cancel my signup"}
                   </button>
                 </div>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Add a note (optional) — e.g. piece you'd like to play"
-                  aria-label="Signup note"
-                  maxLength={500}
-                  rows={2}
-                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors resize-none"
-                />
-              </form>
+              ) : (
+                <form onSubmit={handleSignup} className="space-y-3">
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      aria-label="Your name"
+                      maxLength={100}
+                      className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+                    />
+                    <button
+                      type="submit"
+                      disabled={submitting || !name.trim()}
+                      className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 active:scale-[0.98] transition-all"
+                    >
+                      {submitting ? "Signing up..." : spotsRemaining > 0 ? "Sign Up to Play" : "Join Waitlist"}
+                    </button>
+                  </div>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Add a note (optional) — e.g. piece you'd like to play"
+                    aria-label="Signup note"
+                    maxLength={500}
+                    rows={2}
+                    className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors resize-none"
+                  />
+                </form>
+              )}
+
+              {error && (
+                <div className="mt-3 bg-rose-50 border border-rose-200 rounded-xl p-3">
+                  <p className="text-rose-700 text-sm">{error}</p>
+                </div>
+              )}
             </div>
-          )}
+          </>
+        )}
 
-          {error && (
-            <div className="mt-3 bg-rose-50 border border-rose-200 rounded-xl p-3">
-              <p className="text-rose-700 text-sm">{error}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      <ConfirmDialog
-        open={cancelConfirmOpen}
-        title="Cancel your signup?"
-        description="You'll lose your spot and may need to sign up again later."
-        confirmLabel="Cancel signup"
-        cancelLabel="Keep signup"
-        tone="danger"
-        busy={submitting}
-        onClose={() => setCancelConfirmOpen(false)}
-        onConfirm={handleCancelConfirmed}
-      />
-
-      {/* Signup queue */}
-      <div className="mb-12">
-        <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
-          Signup Queue ({signups.length})
-        </h2>
-        {signups.length === 0 ? (
-          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
-            <p className="text-stone-400 text-sm">No signups yet. Be the first!</p>
-          </div>
-        ) : (
-          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+        {/* Signup queue */}
+        <div className="border-t border-stone-100">
+          <h3 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 px-6 pt-5 pb-2">
+            Signup Queue ({signups.length})
+          </h3>
+          {signups.length === 0 ? (
+            <p className="text-stone-400 text-sm px-6 pb-5">No signups yet. Be the first!</p>
+          ) : (
             <ol className="divide-y divide-stone-100">
               {signups.map((s) => (
                 <li
@@ -369,9 +356,21 @@ export default function Home() {
                 </li>
               ))}
             </ol>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={cancelConfirmOpen}
+        title="Cancel your signup?"
+        description="You'll lose your spot and may need to sign up again later."
+        confirmLabel="Cancel signup"
+        cancelLabel="Keep signup"
+        tone="danger"
+        busy={submitting}
+        onClose={() => setCancelConfirmOpen(false)}
+        onConfirm={handleCancelConfirmed}
+      />
 
       <IdeasBoard />
     </div>
@@ -451,15 +450,16 @@ function IdeasBoard() {
   const done = ideas.filter((i) => i.is_done);
 
   return (
-    <div className="pt-8 border-t border-stone-200">
-      <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-1">
-        Questions & Ideas
-      </h2>
-      <p className="text-xs text-stone-400 mb-5 leading-relaxed">
-        Ask a question, suggest a topic, or share an idea. Vote on what interests you!
-      </p>
+    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+      {/* Header + form */}
+      <div className="px-6 pt-6 pb-5">
+        <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-1">
+          Questions & Ideas
+        </h2>
+        <p className="text-xs text-stone-400 mb-5 leading-relaxed">
+          Ask a question, suggest a topic, or share an idea. Vote on what interests you!
+        </p>
 
-      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5 mb-5">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex gap-3">
             <input
@@ -474,7 +474,7 @@ function IdeasBoard() {
             <button
               type="submit"
               disabled={submittingIdea || !newIdea.trim()}
-              className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
+              className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 active:scale-[0.98] transition-all"
             >
               {submittingIdea ? "..." : "Submit"}
             </button>
@@ -492,13 +492,13 @@ function IdeasBoard() {
       </div>
 
       {active.length === 0 && done.length === 0 && (
-        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
+        <div className="border-t border-stone-100 px-6 py-6 text-center">
           <p className="text-stone-400 text-sm">No ideas yet. Be the first to suggest one!</p>
         </div>
       )}
 
       {active.length > 0 && (
-        <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="border-t border-stone-100">
           <ul className="divide-y divide-stone-100">
             {active.map((idea) => (
               <li key={idea.id} className="flex items-start gap-3 text-sm px-4 py-3">
@@ -530,23 +530,21 @@ function IdeasBoard() {
       )}
 
       {done.length > 0 && (
-        <div className="mt-5">
-          <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 mb-2">Covered</p>
-          <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
-            <ul className="divide-y divide-stone-100">
-              {done.map((idea) => (
-                <li key={idea.id} className="flex items-start gap-3 text-sm px-4 py-3">
-                  <span className="min-w-[2rem] text-center text-xs text-stone-300 pt-0.5 tabular-nums">{idea.votes}</span>
-                  <span className="text-stone-400 line-through">
-                    {idea.text}
-                    {idea.submitted_by && (
-                      <span className="text-stone-300 text-xs ml-1.5">— {idea.submitted_by}</span>
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="border-t border-stone-100">
+          <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-400 px-6 pt-4 pb-2">Covered</p>
+          <ul className="divide-y divide-stone-100 opacity-60">
+            {done.map((idea) => (
+              <li key={idea.id} className="flex items-start gap-3 text-sm px-4 py-3">
+                <span className="min-w-[2rem] text-center text-xs text-stone-300 pt-0.5 tabular-nums">{idea.votes}</span>
+                <span className="text-stone-400 line-through">
+                  {idea.text}
+                  {idea.submitted_by && (
+                    <span className="text-stone-300 text-xs ml-1.5">— {idea.submitted_by}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
