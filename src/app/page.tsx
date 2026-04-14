@@ -60,7 +60,9 @@ export default function Home() {
     try {
       const meetups: Meetup[] = await getMeetups();
       setError("");
-      const upcoming = meetups.find((m) => m.status === "upcoming");
+      const upcoming = meetups
+        .filter((m) => m.status === "upcoming")
+        .sort((a, b) => new Date(a.meetup_date).getTime() - new Date(b.meetup_date).getTime())[0];
       if (!upcoming) {
         setMeetup(null);
         setLoading(false);
