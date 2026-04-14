@@ -867,76 +867,77 @@ function SignupRow({
 
   return (
     <div
-      className={`flex items-center gap-2 text-sm p-3 rounded-xl ${
+      className={`text-sm p-3 rounded-xl ${
         s.position <= maxSpots ? "bg-emerald-50" : "bg-stone-50"
       }`}
     >
-      <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
-          s.position <= maxSpots
-            ? "bg-emerald-100 text-emerald-700"
-            : "bg-stone-200 text-stone-500"
-        }`}
-      >
-        {s.position}
-      </span>
-
-      {editingName ? (
-        <span className="flex items-center gap-1 min-w-0">
-          <input
-            type="text"
-            value={nameValue}
-            onChange={(e) => setNameValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSaveName();
-              if (e.key === "Escape") setEditingName(false);
-            }}
-            className="border border-stone-200 rounded-lg px-2 py-0.5 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-            autoFocus
-          />
-          <button
-            onClick={handleSaveName}
-            className="text-xs text-amber-600 hover:text-amber-700 font-medium"
-          >
-            Save
-          </button>
-          <button
-            onClick={() => { setNameValue(s.name); setEditingName(false); }}
-            className="text-xs text-stone-400 hover:text-stone-600"
-          >
-            Cancel
-          </button>
-        </span>
-      ) : (
+      <div className="flex items-center gap-2">
         <span
-          className="font-medium min-w-0 cursor-pointer hover:underline text-stone-900"
-          onClick={() => setEditingName(true)}
-          title="Click to edit name"
-        >
-          {s.name}
-        </span>
-      )}
-
-      {s.has_priority && (
-        <span className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-md shrink-0 font-medium">
-          P
-        </span>
-      )}
-      {s.status !== "active" && (
-        <span
-          className={`text-xs px-1.5 py-0.5 rounded-md shrink-0 font-medium ${
-            s.status === "played"
+          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
+            s.position <= maxSpots
               ? "bg-emerald-100 text-emerald-700"
-              : s.status === "not_reached"
-              ? "bg-amber-100 text-amber-700"
-              : "bg-rose-100 text-rose-700"
+              : "bg-stone-200 text-stone-500"
           }`}
         >
-          {s.status.replace("_", " ")}
+          {s.position}
         </span>
-      )}
 
-      <div className="ml-auto flex items-center gap-1 shrink-0">
+        {editingName ? (
+          <span className="flex items-center gap-1 min-w-0">
+            <input
+              type="text"
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveName();
+                if (e.key === "Escape") setEditingName(false);
+              }}
+              className="border border-stone-200 rounded-lg px-2 py-0.5 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              autoFocus
+            />
+            <button
+              onClick={handleSaveName}
+              className="text-xs text-amber-600 hover:text-amber-700 font-medium"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => { setNameValue(s.name); setEditingName(false); }}
+              className="text-xs text-stone-400 hover:text-stone-600"
+            >
+              Cancel
+            </button>
+          </span>
+        ) : (
+          <span
+            className="font-medium min-w-0 cursor-pointer hover:underline text-stone-900"
+            onClick={() => setEditingName(true)}
+            title="Click to edit name"
+          >
+            {s.name}
+          </span>
+        )}
+
+        {s.has_priority && (
+          <span className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-md shrink-0 font-medium">
+            P
+          </span>
+        )}
+        {s.status !== "active" && (
+          <span
+            className={`text-xs px-1.5 py-0.5 rounded-md shrink-0 font-medium ${
+              s.status === "played"
+                ? "bg-emerald-100 text-emerald-700"
+                : s.status === "not_reached"
+                ? "bg-amber-100 text-amber-700"
+                : "bg-rose-100 text-rose-700"
+            }`}
+          >
+            {s.status.replace("_", " ")}
+          </span>
+        )}
+
+        <div className="ml-auto flex items-center gap-1 shrink-0">
         {s.status === "active" ? (
           <>
             <button
@@ -994,7 +995,11 @@ function SignupRow({
         >
           ×
         </button>
+        </div>
       </div>
+      {s.note && (
+        <p className="text-xs text-stone-400 mt-1.5 ml-8 leading-relaxed italic">{s.note}</p>
+      )}
 
       <ConfirmDialog
         open={removeOpen}

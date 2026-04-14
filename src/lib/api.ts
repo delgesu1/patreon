@@ -31,11 +31,11 @@ export async function getSignups(meetupId: string) {
   return handleResponse(res);
 }
 
-export async function createSignup(meetupId: string, name: string) {
+export async function createSignup(meetupId: string, name: string, note?: string) {
   const res = await fetch(`${BASE}/api/meetups/${meetupId}/signups`, {
     method: "POST",
     headers: publicHeaders(),
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, note: note || null }),
   });
   return handleResponse(res);
 }

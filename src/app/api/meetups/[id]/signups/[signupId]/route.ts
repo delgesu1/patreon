@@ -35,6 +35,12 @@ export async function PATCH(
     updates.name = trimmed;
   }
 
+  // Allow editing note
+  if (typeof body.note === "string") {
+    const trimmed = body.note.trim();
+    updates.note = trimmed.slice(0, 500) || null;
+  }
+
   // Allow toggling granted_priority
   if (typeof body.granted_priority === "boolean") {
     updates.granted_priority = body.granted_priority;

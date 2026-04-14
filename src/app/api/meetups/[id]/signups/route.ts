@@ -25,6 +25,7 @@ export async function POST(
   const { id: meetupId } = await params;
   const body = await request.json();
   const name = (body.name || "").trim();
+  const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) || null : null;
 
   // Validate name
   if (!name) {
@@ -102,6 +103,7 @@ export async function POST(
     .insert({
       meetup_id: meetupId,
       name,
+      note,
       position: nextPosition,
       has_priority: hasPriority,
     })

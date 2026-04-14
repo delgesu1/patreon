@@ -52,6 +52,7 @@ export default function Home() {
   const [mySignup, setMySignup] = useState<Signup | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
@@ -112,9 +113,10 @@ export default function Home() {
     setError("");
     setSubmitting(true);
     try {
-      const signup = await createSignup(meetup.id, name.trim());
+      const signup = await createSignup(meetup.id, name.trim(), note.trim() || undefined);
       localStorage.setItem("signup_name", name.trim());
       setMySignup(signup);
+      setNote("");
       await loadData();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to sign up");
@@ -250,6 +252,11 @@ export default function Home() {
                   Moved to front — didn&apos;t get to play last time
                 </span>
               )}
+              {mySignup.note && (
+                <p className="text-sm text-stone-500 italic mb-3">
+                  &ldquo;{mySignup.note}&rdquo;
+                </p>
+              )}
               <button
                 type="button"
                 onClick={() => setCancelConfirmOpen(true)}
@@ -261,23 +268,34 @@ export default function Home() {
             </div>
           ) : (
             <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5">
-              <form onSubmit={handleSignup} className="flex gap-3">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  aria-label="Your name"
-                  maxLength={100}
-                  className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+              <form onSubmit={handleSignup} className="space-y-3">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your name"
+                    aria-label="Your name"
+                    maxLength={100}
+                    className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitting || !name.trim()}
+                    className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
+                  >
+                    {submitting ? "Signing up..." : spotsRemaining > 0 ? "Sign Up to Play" : "Join Waitlist"}
+                  </button>
+                </div>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Add a note (optional) — e.g. piece you'd like to play"
+                  aria-label="Signup note"
+                  maxLength={500}
+                  rows={2}
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors resize-none"
                 />
-                <button
-                  type="submit"
-                  disabled={submitting || !name.trim()}
-                  className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
-                >
-                  {submitting ? "Signing up..." : spotsRemaining > 0 ? "Sign Up to Play" : "Join Waitlist"}
-                </button>
               </form>
             </div>
           )}
@@ -317,12 +335,12 @@ export default function Home() {
               {signups.map((s) => (
                 <li
                   key={s.id}
-                  className={`flex items-center gap-3 text-sm px-4 py-3 ${
+                  className={`flex items-start gap-3 text-sm px-4 py-3 ${
                     mySignup?.id === s.id ? "ring-2 ring-inset ring-amber-400/50 bg-amber-50/30" : ""
                   }`}
                 >
                   <span
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold mt-0.5 ${
                       s.position <= meetup.max_spots
                         ? "bg-emerald-100 text-emerald-700"
                         : "bg-stone-100 text-stone-500"
@@ -330,16 +348,23 @@ export default function Home() {
                   >
                     {s.position}
                   </span>
-                  <span className="font-medium text-stone-900">{s.name}</span>
-                  {s.has_priority && (
-                    <span className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-md font-medium" title="Didn't get to play last time">
-                      priority
-                    </span>
-                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-stone-900">{s.name}</span>
+                      {s.has_priority && (
+                        <span className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-md font-medium" title="Didn't get to play last time">
+                          priority
+                        </span>
+                      )}
+                    </div>
+                    {s.note && (
+                      <p className="text-xs text-stone-400 mt-0.5 leading-relaxed">{s.note}</p>
+                    )}
+                  </div>
                   {s.position <= meetup.max_spots ? (
-                    <span className="ml-auto text-xs font-medium text-emerald-600">confirmed</span>
+                    <span className="shrink-0 text-xs font-medium text-emerald-600 mt-1">confirmed</span>
                   ) : (
-                    <span className="ml-auto text-xs text-stone-400">waitlist</span>
+                    <span className="shrink-0 text-xs text-stone-400 mt-1">waitlist</span>
                   )}
                 </li>
               ))}

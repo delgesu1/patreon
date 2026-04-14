@@ -22,6 +22,7 @@ export interface Signup {
   name: string;
   position: number;
   status: "active" | "played" | "not_reached" | "no_show" | "cancelled";
+  note: string | null;
   has_priority: boolean;
   granted_priority: boolean;
   created_at: string;
