@@ -25,9 +25,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Text must be under 500 characters" }, { status: 400 });
   }
 
+  const rawName = (body.submitted_by || "").trim().slice(0, 100);
+  const submitted_by = rawName || null;
+
   const { data, error } = await supabase
     .from("ideas")
-    .insert({ text })
+    .insert({ text, submitted_by })
     .select()
     .single();
 

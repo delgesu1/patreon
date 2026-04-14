@@ -520,7 +520,7 @@ function AdminIdeasSection() {
   return (
     <section className="pt-8 border-t border-stone-200">
       <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-4">
-        Topic Ideas ({active.length})
+        Questions & Ideas ({active.length})
       </h2>
       {active.length === 0 && (
         <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-6 text-center">
@@ -535,7 +535,12 @@ function AdminIdeasSection() {
                 <span className="text-xs font-semibold text-stone-500 min-w-[1.5rem] text-center tabular-nums">
                   {idea.votes}
                 </span>
-                <span className="flex-1 text-stone-700">{idea.text}</span>
+                <span className="flex-1 text-stone-700">
+                  {idea.text}
+                  {idea.submitted_by && (
+                    <span className="text-stone-400 text-xs ml-1.5">— {idea.submitted_by}</span>
+                  )}
+                </span>
                 <button
                   type="button"
                   onClick={() => handleToggleDone(idea.id, idea.is_done)}
@@ -563,7 +568,12 @@ function AdminIdeasSection() {
               {done.map((idea) => (
                 <div key={idea.id} className="flex items-center gap-3 text-sm px-4 py-3">
                   <span className="text-xs text-stone-300 min-w-[1.5rem] text-center tabular-nums">{idea.votes}</span>
-                  <span className="flex-1 text-stone-400 line-through">{idea.text}</span>
+                  <span className="flex-1 text-stone-400 line-through">
+                    {idea.text}
+                    {idea.submitted_by && (
+                      <span className="text-stone-300 text-xs ml-1.5">— {idea.submitted_by}</span>
+                    )}
+                  </span>
                   <button
                     type="button"
                     onClick={() => handleToggleDone(idea.id, idea.is_done)}

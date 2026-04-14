@@ -13,6 +13,7 @@ export interface Idea {
   text: string;
   votes: number;
   is_done: boolean;
+  submitted_by: string | null;
   created_at: string;
 }
 

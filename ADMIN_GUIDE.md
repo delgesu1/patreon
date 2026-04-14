@@ -21,7 +21,7 @@ When a subscriber visits the site, they see the next upcoming meetup with its da
 - **After signups open:** Subscribers type their name and click "Sign Up to Play." They can also leave an optional note (e.g. the piece they'd like to play). Their name is saved in their browser so they don't have to re-type it next time.
 - **Confirmed vs. waitlisted:** The meetup has a set number of spots (e.g. 4). Signups within that limit are "confirmed." Everyone else is on the waitlist.
 - **Cancelling:** A subscriber can cancel their own signup. If they do, the next person on the waitlist automatically moves up into a confirmed spot.
-- **Topic Ideas:** At the bottom of the page, subscribers can suggest topics for meetups and vote on each other's ideas.
+- **Questions & Ideas:** At the bottom of the page, subscribers can ask questions, suggest topics, or share ideas for meetups — and optionally include their name. They can also vote on each other's submissions.
 
 Subscribers identify by name only — there are no accounts or logins.
 
@@ -78,9 +78,9 @@ After the meetup is over and you've marked everyone's status:
 
 A warning shows if any signups are still unmarked ("active").
 
-### Managing topic ideas
+### Managing questions & ideas
 
-At the bottom of the admin dashboard, you'll see all topic ideas submitted by subscribers:
+At the bottom of the admin dashboard, you'll see all questions and ideas submitted by subscribers. If a subscriber included their name, it appears next to the text.
 
 - **Done** — Mark a topic as covered. It moves to the "Covered" section.
 - **Undo** — Move it back to active.

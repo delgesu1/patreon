@@ -381,6 +381,7 @@ export default function Home() {
 function IdeasBoard() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [newIdea, setNewIdea] = useState("");
+  const [ideaName, setIdeaName] = useState("");
   const [submittingIdea, setSubmittingIdea] = useState(false);
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const [pendingVoteIds, setPendingVoteIds] = useState<Set<string>>(new Set());
@@ -407,8 +408,9 @@ function IdeasBoard() {
     if (!newIdea.trim()) return;
     setSubmittingIdea(true);
     try {
-      await createIdea(newIdea.trim());
+      await createIdea(newIdea.trim(), ideaName.trim() || undefined);
       setNewIdea("");
+      setIdeaName("");
       await loadIdeas();
     } catch { /* silent */ }
     setSubmittingIdea(false);
@@ -451,30 +453,41 @@ function IdeasBoard() {
   return (
     <div className="pt-8 border-t border-stone-200">
       <h2 className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-500 mb-1">
-        Topic Ideas
+        Questions & Ideas
       </h2>
       <p className="text-xs text-stone-400 mb-5 leading-relaxed">
-        Suggest topics for upcoming meetups. Vote on what interests you!
+        Ask a question, suggest a topic, or share an idea. Vote on what interests you!
       </p>
 
       <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5 mb-5">
-        <form onSubmit={handleSubmit} className="flex gap-3">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={newIdea}
+              onChange={(e) => setNewIdea(e.target.value)}
+              placeholder="Ask a question or suggest a topic..."
+              aria-label="Ask a question or suggest a topic"
+              maxLength={500}
+              className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+            />
+            <button
+              type="submit"
+              disabled={submittingIdea || !newIdea.trim()}
+              className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
+            >
+              {submittingIdea ? "..." : "Submit"}
+            </button>
+          </div>
           <input
             type="text"
-            value={newIdea}
-            onChange={(e) => setNewIdea(e.target.value)}
-            placeholder="Suggest a topic or question..."
-            aria-label="Suggest a topic or question"
-            maxLength={500}
-            className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
+            value={ideaName}
+            onChange={(e) => setIdeaName(e.target.value)}
+            placeholder="Your name (optional)"
+            aria-label="Your name (optional)"
+            maxLength={100}
+            className="w-full border border-stone-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
           />
-          <button
-            type="submit"
-            disabled={submittingIdea || !newIdea.trim()}
-            className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors shadow-sm"
-          >
-            {submittingIdea ? "..." : "Submit"}
-          </button>
         </form>
       </div>
 
@@ -504,7 +517,12 @@ function IdeasBoard() {
                   <span className="text-xs leading-none">&#9650;</span>
                   <span className="text-xs font-semibold tabular-nums">{idea.votes}</span>
                 </button>
-                <span className="text-stone-700 leading-relaxed">{idea.text}</span>
+                <span className="text-stone-700 leading-relaxed">
+                  {idea.text}
+                  {idea.submitted_by && (
+                    <span className="text-stone-400 text-xs ml-1.5">— {idea.submitted_by}</span>
+                  )}
+                </span>
               </li>
             ))}
           </ul>
@@ -519,7 +537,12 @@ function IdeasBoard() {
               {done.map((idea) => (
                 <li key={idea.id} className="flex items-start gap-3 text-sm px-4 py-3">
                   <span className="min-w-[2rem] text-center text-xs text-stone-300 pt-0.5 tabular-nums">{idea.votes}</span>
-                  <span className="text-stone-400 line-through">{idea.text}</span>
+                  <span className="text-stone-400 line-through">
+                    {idea.text}
+                    {idea.submitted_by && (
+                      <span className="text-stone-300 text-xs ml-1.5">— {idea.submitted_by}</span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

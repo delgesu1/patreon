@@ -54,11 +54,11 @@ export async function getIdeas() {
   return handleResponse(res);
 }
 
-export async function createIdea(text: string) {
+export async function createIdea(text: string, submittedBy?: string) {
   const res = await fetch(`${BASE}/api/ideas`, {
     method: "POST",
     headers: publicHeaders(),
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, submitted_by: submittedBy || null }),
   });
   return handleResponse(res);
 }
