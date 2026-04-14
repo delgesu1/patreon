@@ -4,12 +4,12 @@
 
 This is a signup app for Daniel Kurganov's bi-weekly Patreon violin meetups. Subscribers visit the site to sign up for upcoming meetups, suggest ideas/questions/topics for the sessions, and vote on what interests them. An admin manages the meetups and ideas from a dashboard.
 
-The app lives at your Vercel URL (e.g. `https://your-domain.vercel.app`).
+The app lives at **kurganov.org/patreon**.
 
 There are two pages:
 
-- **Subscriber page** (`/`) — public, no login required
-- **Admin dashboard** (`/admin`) — password-protected
+- **Subscriber page** (`kurganov.org/patreon`) — public, no login required
+- **Admin dashboard** (`kurganov.org/patreon/admin`) — password-protected
 
 ---
 
@@ -18,7 +18,7 @@ There are two pages:
 When a subscriber visits the site, they see the next upcoming meetup with its date and time (always shown in Eastern Time).
 
 - **Before signups open:** A countdown timer shows when signups will become available.
-- **After signups open:** Subscribers type their name and click "Sign Up to Play." Their name is saved in their browser so they don't have to re-type it next time.
+- **After signups open:** Subscribers type their name and click "Sign Up to Play." They can also leave an optional note (e.g. the piece they'd like to play). Their name is saved in their browser so they don't have to re-type it next time.
 - **Confirmed vs. waitlisted:** The meetup has a set number of spots (e.g. 4). Signups within that limit are "confirmed." Everyone else is on the waitlist.
 - **Cancelling:** A subscriber can cancel their own signup. If they do, the next person on the waitlist automatically moves up into a confirmed spot.
 - **Topic Ideas:** At the bottom of the page, subscribers can suggest topics for meetups and vote on each other's ideas.
@@ -31,7 +31,7 @@ Subscribers identify by name only — there are no accounts or logins.
 
 ### Logging in
 
-Go to `/admin` and enter the admin password. Your session lasts until you close the browser tab or click "Log out."
+Go to `kurganov.org/patreon/admin` and enter the admin password. Your session lasts until you close the browser tab or click "Log out."
 
 ### Creating a meetup
 
@@ -52,7 +52,7 @@ Click on any meetup card to expand it. From there you can:
 
 ### Managing signups
 
-Inside an expanded meetup, you'll see the signup list. For each person:
+Inside an expanded meetup, you'll see the signup list. If a subscriber left a note, it appears in italic below their name. For each person:
 
 - **Played** — Mark them as having played in the meetup.
 - **Skip** — They were signed up but didn't get reached (ran out of time).

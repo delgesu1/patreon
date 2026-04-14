@@ -1,4 +1,4 @@
-const BASE = "";
+const BASE = "/patreon";
 
 function adminHeaders(): HeadersInit {
   const password = sessionStorage.getItem("admin_password") || "";
